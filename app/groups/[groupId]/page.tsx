@@ -30,7 +30,7 @@ type ActivityItem = {
   type: string;
   meta: any;
   createdAt: Date;
-  actorId: string;
+  actorId: string | null;
 };
 
 function formatINR(paise: number) {
@@ -134,8 +134,8 @@ export default async function GroupDetailsPage({
     select: { id: true, type: true, meta: true, createdAt: true, actorId: true },
   });
 
-  function actLine(a: { type: string; meta: any; actorId: string }) {
-    const actor = userLabel(a.actorId);
+  function actLine(a: { type: string; meta: any; actorId: string | null }) {
+    const actor = a.actorId?userLabel(a.actorId):"Someone";
 
     if (a.type === "GROUP_CREATED") return `${actor} created the group`;
     if (a.type === "MEMBER_JOINED") return `${actor} joined the group`;
