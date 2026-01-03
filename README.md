@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Splitwise-lite
 
-## Getting Started
+A Splitwise-inspired expense sharing app with groups, invite links, multi-split expenses, balances, and settlements.
 
-First, run the development server:
+## Features
+- Auth: Google + GitHub OAuth (NextAuth)
+- Groups: create group, membership enforcement
+- Invites: owner-only invite links, join via token
+- Expenses: EQUAL / EXACT / PERCENT splits, idempotency support
+- Balances: net balances + minimized settlement suggestions
+- Settlements: record settlements + “use suggestion” workflow
+- Safety: soft-delete expenses + activity log (audit trail)
+- Pagination: cursor-based “Load more” for expenses and settlements
+- RBAC: owner-only member removal (cannot remove last owner; cannot remove member with non-zero balance)
 
-```bash
+## Tech Stack
+- Next.js (App Router)
+- NextAuth.js (OAuth)
+- Prisma ORM + MongoDB Atlas
+- TypeScript
+- Tailwind CSS
+
+---
+
+## Local Setup
+1)clone the project and install the dependenices using the command npm install
+
+2) Create .env.local (in project root)
+
+Create a file named .env.local next to package.json.
+
+Include the code in the .env.local file 
+
+DATABASE_URL="mongodb+srv://USER:PASSWORD@HOST/splitwise-lite?retryWrites=true&w=majority"
+
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="YOUR_LONG_RANDOM_SECRET"
+
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+
+GITHUB_ID="..."
+GITHUB_SECRET="..."
+
+
+Notes:
+
+Do NOT commit .env.local
+
+Optional: create .env.example for the repo (without secrets)
+
+3) Run the below Prisma commands
+npx prisma db push
+npx prisma generate
+
+4) Run
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open: http://localhost:3000
