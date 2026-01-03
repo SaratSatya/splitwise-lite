@@ -29,18 +29,25 @@ A Splitwise-inspired expense sharing app with groups, invite links, multi-split 
 
 Create a file named .env.local next to package.json.
 
-Include the code in the .env.local file 
+### 2) Environment Variables
 
-DATABASE_URL="mongodb+srv://USER:PASSWORD@HOST/splitwise-lite?retryWrites=true&w=majority"
+Create `.env.local` in the project root (same level as `package.json`):
 
+```env
+# MongoDB Atlas
+DATABASE_URL="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority"
+
+# NextAuth
+NEXTAUTH_SECRET="<random_32byte_hex>"
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="YOUR_LONG_RANDOM_SECRET"
 
-GOOGLE_CLIENT_ID="..."
-GOOGLE_CLIENT_SECRET="..."
+# OAuth providers
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
 
-GITHUB_ID="..."
-GITHUB_SECRET="..."
+GITHUB_ID=""
+GITHUB_SECRET=""
+```
 
 
 Notes:
