@@ -57,11 +57,11 @@ Do NOT commit .env.local
 Optional: create .env.example for the repo (without secrets)
 
 3) Run the below Prisma commands
-npx prisma db push
-npx prisma generate
+```npx prisma db push
+npx prisma generate```
 
 4) Run
-npm run dev
+``npm run dev````
 
 
-Open: http://localhost:3000
+```Open: http://localhost:3000```
