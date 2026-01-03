@@ -30,8 +30,10 @@ export async function POST(
       },
     });
 
-    const base = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    const base =process.env.NEXTAUTH_URL ??(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
     const joinUrl = `${base}/join/${token}`;
+
 
     return ok({ token, joinUrl, expiresAt }, 201);
   } catch (e: any) {
