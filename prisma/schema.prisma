@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum GroupRole {
+  OWNER
+  MEMBER
+}
+
+enum ExpenseSplitType {
+  EQUAL
+  EXACT
+  PERCENT
+}
+
+enum ActivityType {
+  GROUP_CREATED
+  MEMBER_JOINED
+  MEMBER_REMOVED
+  EXPENSE_ADDED
+  EXPENSE_DELETED
+  SETTLEMENT_ADDED
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String?
+  email        String?  @unique
+  emailVerified DateTime?
+  image        String?
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+
+  accounts     Account[]
+  sessions     Session[]
+  memberships  GroupMember[]
+  expensesPaid Expense[]      @relation("ExpensePaidBy")
+  splits       ExpenseSplit[]
+}
+
+model Group {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  createdById String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     GroupMember[]
+  expenses    Expense[]
+  invites     GroupInvite[]
+  activities  ActivityLog[]
+  settlements Settlement[]
+}
+
+model GroupMember {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  groupId  String    @db.ObjectId
+  userId   String    @db.ObjectId
+  role     GroupRole @default(MEMBER)
+  joinedAt DateTime  @default(now())
+
+  group Group @relation(fields: [groupId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model GroupInvite {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String   @db.ObjectId
+  token     String   @unique
+  createdBy String   @db.ObjectId
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id])
+}
+
+model Expense {
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  groupId      String           @db.ObjectId
+  description  String
+  amount       Int // store in paise to avoid float issues
+  currency     String           @default("INR")
+  paidByUserId String           @db.ObjectId
+  splitType    ExpenseSplitType
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  isDeleted    Boolean          @default(false)
+  deletedAt    DateTime?
+  deletedBy    String?          @db.ObjectId
+
+  // idempotency to avoid duplicates on retry
+  idempotencyKey String? @unique
+
+  group  Group          @relation(fields: [groupId], references: [id])
+  paidBy User           @relation("ExpensePaidBy", fields: [paidByUserId], references: [id])
+  splits ExpenseSplit[]
+}
+
+model ExpenseSplit {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  expenseId String @db.ObjectId
+  userId    String @db.ObjectId
+  share     Int // paise owed by this user in this expense
+  isDeleted Boolean @default(false)
+
+  expense Expense @relation(fields: [expenseId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([expenseId, userId])
+}
+
+model Settlement {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId    String   @db.ObjectId
+  fromUserId String   @db.ObjectId
+  toUserId   String   @db.ObjectId
+  amount     Int // paise
+  note       String?
+  createdAt  DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id])
+}
+
+model ActivityLog {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String       @db.ObjectId
+  actorId   String?      @db.ObjectId
+  type      ActivityType
+  meta      Json?
+  createdAt DateTime     @default(now())
+
+  group Group @relation(fields: [groupId], references: [id])
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
