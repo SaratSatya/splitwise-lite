@@ -206,7 +206,7 @@ export default async function GroupDetailsPage({
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5 lg:self-start lg:sticky lg:top-4">
             <Card>
               <CardHeader>
                 <div className="text-sm font-semibold">Balances</div>
@@ -269,7 +269,7 @@ export default async function GroupDetailsPage({
                 <div className="text-sm font-semibold">Settlements</div>
                 <div className="text-xs text-white/60 mt-1">Latest settlement records.</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="max-h-[28rem] overflow-y-auto">
                 <SettlementsList
                   groupId={groupId}
                   members={memberOptions}
@@ -284,7 +284,7 @@ export default async function GroupDetailsPage({
                 <div className="text-sm font-semibold">Recent Expenses</div>
                 <div className="text-xs text-white/60 mt-1">Most recent first.</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="max-h-[28rem] overflow-y-auto">
                 <ExpensesList groupId={groupId} initialExpenses={expenses} initialNextCursor={expensesNextCursor} />
               </CardContent>
             </Card>
@@ -294,7 +294,7 @@ export default async function GroupDetailsPage({
                 <div className="text-sm font-semibold">Activity</div>
                 <div className="text-xs text-white/60 mt-1">Last 30 actions.</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="max-h-[28rem] overflow-y-auto">
                 <div className="space-y-3">
                   {activities.length === 0 ? (
                     <div className="text-sm text-white/60">No activity yet.</div>
